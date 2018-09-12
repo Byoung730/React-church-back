@@ -141,6 +141,36 @@ app.post("/api/new-expense", (request, response) => {
   });
 });
 
+//PUT API
+app.put("/api/expenses/:id", (request, response) => {
+  const item = request.body.item;
+  const description = request.body.description;
+  const amount = request.body.amount;
+  const date = request.body.date;
+  const id = request.body.id;
+  let values = [item, description, amount, date, id];
+  pool.connect((err, db, done) => {
+    if (err) {
+      return console.log(err);
+    } else {
+      db.query(
+        "UPDATE expenses SET item=$1, description=$2, amount=$3, date=$4, WHERE id=$5 VALUES($1, $2, $3, $4, $5)",
+        [...values],
+        (err, table) => {
+          done();
+          if (err) {
+            return response.status(400).send(err);
+          } else {
+            console.log("DATA UPDATED");
+            response.status(201).send({ message: "Data updated!" });
+          }
+        }
+      );
+    }
+  });
+});
+
+});
 app.post("/api/new-people", (request, response) => {
   const email = request.body.email;
   const first_name = request.body.first_name;
