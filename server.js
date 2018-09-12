@@ -11,7 +11,7 @@ app.use(cors());
 const pool = new Pool({
   port: 5432,
   user: "evrvj",
-  password: XXXXXX,
+  password: "gangster",
   database: "church",
   max: 10,
   host: "localhost"
@@ -148,14 +148,13 @@ app.put("/api/expenses/:id", (request, response) => {
   const amount = request.body.amount;
   const date = request.body.date;
   const id = request.body.id;
-  let values = [item, description, amount, date, id];
   pool.connect((err, db, done) => {
     if (err) {
       return console.log(err);
     } else {
       db.query(
-        "UPDATE expenses SET item=$1, description=$2, amount=$3, date=$4, WHERE id=$5 VALUES($1, $2, $3, $4, $5)",
-        [...values],
+        "UPDATE expenses SET item=$1, description=$2, amount=$3, date=$4 WHERE id=$5",
+        [item, description, amount, date, Number(id)],
         (err, table) => {
           done();
           if (err) {
@@ -170,7 +169,6 @@ app.put("/api/expenses/:id", (request, response) => {
   });
 });
 
-});
 app.post("/api/new-people", (request, response) => {
   const email = request.body.email;
   const first_name = request.body.first_name;
