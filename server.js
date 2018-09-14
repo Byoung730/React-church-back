@@ -11,7 +11,7 @@ app.use(cors());
 const pool = new Pool({
   port: 5432,
   user: "evrvj",
-  password: XXXXXXX,
+  password: "gangster",
   database: "church",
   max: 10,
   host: "localhost"
@@ -31,27 +31,27 @@ app.use((request, response, next) => {
   next();
 });
 
-// app.delete("/api/remove/:id", (request, response) => {
-//   let id = request.params.id;
-//   pool.connect((err, db, done) => {
-//     if (err) {
-//       return response.status(400).send(err);
-//     } else {
-//       db.query(
-//         "DELETE FROM people WHERE id = $1",
-//         [Number(id)],
-//         (err, result) => {
-//           done();
-//           if (err) {
-//             return response.status(400).send(err);
-//           } else {
-//             return response.status(200).send({ message: "success" });
-//           }
-//         }
-//       );
-//     }
-//   });
-// });
+app.delete("/api/remove-person/:id", (request, response) => {
+  let id = request.params.id;
+  pool.connect((err, db, done) => {
+    if (err) {
+      return response.status(400).send(err);
+    } else {
+      db.query(
+        "DELETE FROM people WHERE id = $1",
+        [Number(id)],
+        (err, result) => {
+          done();
+          if (err) {
+            return response.status(400).send(err);
+          } else {
+            return response.status(200).send({ message: "success" });
+          }
+        }
+      );
+    }
+  });
+});
 
 app.delete("/api/remove-expense/:id", (request, response) => {
   let id = request.params.id;
@@ -97,33 +97,37 @@ app.delete("/api/remove-income/:id", (request, response) => {
   });
 });
 
-// app.get("/people", (request, response) => {
-//   pool.connect((err, db, done) => {
-//     if (err) {
-//       return response.status(400).send(err);
-//     } else {
-//       db.query("SELECT * FROM people", (err, table) => {
-//         done();
-//         if (err) {
-//           return response.status(400).send(err);
-//         } else {
-//           console.log("DATA RETRIEVED");
-//           db.end();
-//           response.status(200).send(table.rows);
-//         }
-//       });
-//     }
-//   });
-// });
+app.get("/people", (request, response) => {
+  pool.connect((err, db, done) => {
+    if (err) {
+      console.log("Error1 --> Look: ", err);
+      return response.status(400).send(err);
+    } else {
+      db.query("SELECT * FROM people", (err, table) => {
+        done();
+        if (err) {
+          console.log("Error2 --> Look: ", err);
+          return response.status(400).send(err);
+        } else {
+          console.log("DATA RETRIEVED");
+          db.end();
+          response.status(200).send(table.rows);
+        }
+      });
+    }
+  });
+});
 
 app.get("/expenses", (request, response) => {
   pool.connect((err, db, done) => {
     if (err) {
+      console.log("Error1 --> Look: ", err);
       return response.status(400).send(err);
     } else {
       db.query("SELECT * FROM expenses", (err, table) => {
         done();
         if (err) {
+          console.log("Error2 --> Look: ", err);
           return response.status(400).send(err);
         } else {
           console.log("DATA RETRIEVED");
@@ -138,11 +142,13 @@ app.get("/expenses", (request, response) => {
 app.get("/income", (request, response) => {
   pool.connect((err, db, done) => {
     if (err) {
+      console.log("Error1 --> Look: ", err);
       return response.status(400).send(err);
     } else {
       db.query("SELECT * FROM income", (err, table) => {
         done();
         if (err) {
+          console.log("Error2 --> Look: ", err);
           return response.status(400).send(err);
         } else {
           console.log("DATA RETRIEVED");
@@ -264,52 +270,63 @@ app.put("/api/income/:id", (request, response) => {
   });
 });
 
-// app.post("/api/new-people", (request, response) => {
-//   const email = request.body.email;
-//   const first_name = request.body.first_name;
-//   const last_name = request.body.last_name;
-//   const id = Math.random().toFixed(8);
-//   const address = request.body.address;
-//   const phone = request.body.phone;
-//   const staff = request.body.staff;
-//   const gender = request.body.gender;
-//   const date_joined = request.body.date_joined;
-//   const birthdate = request.body.birthdate;
-//   const marital_status = request.body.marital_status;
-//   const allow_texts = request.body.allow_texts;
-//   let values = [
-//     email,
-//     first_name,
-//     last_name,
-//     id,
-//     address,
-//     phone,
-//     staff,
-//     gender,
-//     date_joined,
-//     birthdate,
-//     marital_status,
-//     allow_texts
-//   ];
-//   pool.connect((err, db, done) => {
-//     if (err) {
-//       return console.log(err);
-//     } else {
-//       db.query(
-//         "INSERT INTO people (email, first_name, last_name, id, address, phone, staff, gender, date_joined, birthdate, marital_status, allow_texts) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
-//         [...values],
-//         (err, table) => {
-//           done();
-//           if (err) {
-//             return response.status(400).send(err);
-//           } else {
-//             console.log("DATA INSERTED");
-//             response.status(201).send({ message: "Data inserted!" });
-//           }
-//         }
-//       );
-//     }
-//   });
-// });
+app.put("/api/people/:id", (request, response) => {
+  const email = request.body.email;
+  const name = request.body.name;
+  const address = request.body.address;
+  const phone = request.body.phone;
+  const id = request.body.id;
+  const date_joined = request.body.date_joined;
+  pool.connect((err, db, done) => {
+    if (err) {
+      return console.log(err);
+    } else {
+      db.query(
+        "UPDATE income SET email=$1, name=$2, address=$3, phone=$4, date_joined=$5 WHERE id=$6",
+        [email, name, address, phone, date_joined, Number(id)],
+        (err, table) => {
+          done();
+          if (err) {
+            return response.status(400).send(err);
+          } else {
+            console.log("DATA UPDATED");
+            response.status(201).send({ message: "Data updated!" });
+          }
+        }
+      );
+    }
+  });
+});
+
+app.post("/api/new-people", (request, response) => {
+  const email = request.body.email;
+  const name = request.body.name;
+  const address = request.body.address;
+  const phone = request.body.phone;
+  const id = Math.random().toFixed(8);
+  const date_joined = request.body.date_joined;
+  let values = [email, name, address, phone, id, date_joined];
+  pool.connect((err, db, done) => {
+    if (err) {
+      console.log("Error1 --> Look: ", err);
+      return console.log(err);
+    } else {
+      db.query(
+        "INSERT INTO people (email, name, address, phone, id, date_joined) VALUES($1, $2, $3, $4, $5, $6)",
+        [...values],
+        (err, table) => {
+          done();
+          if (err) {
+            console.log("Error2 --> Look: ", err);
+            return response.status(400).send(err);
+          } else {
+            console.log("DATA INSERTED");
+            response.status(201).send({ message: "Data inserted!" });
+          }
+        }
+      );
+    }
+  });
+});
 
 app.listen(PORT, () => console.log("Listening on port " + PORT));
