@@ -11,7 +11,7 @@ app.use(cors());
 const pool = new Pool({
   port: 5432,
   user: "evrvj",
-  password: "gangster",
+  password: XXXXXXX,
   database: "church",
   max: 10,
   host: "localhost"
@@ -166,14 +166,14 @@ app.post("/api/new-expense", (request, response) => {
   const amount = request.body.amount;
   const date = request.body.date;
   const id = Math.random().toFixed(8);
-  let values = [item, description, amount, date, id];
+  // let values = [item, description, amount, date, id];
   pool.connect((err, db, done) => {
     if (err) {
       return console.log(err);
     } else {
       db.query(
         "INSERT INTO expenses (item, description, amount, date, id) VALUES($1, $2, $3, $4, $5)",
-        [...values],
+        [item, description, amount, date, id],
         (err, table) => {
           done();
           if (err) {
@@ -279,14 +279,15 @@ app.put("/api/people/:id", (request, response) => {
   const date_joined = request.body.date_joined;
   pool.connect((err, db, done) => {
     if (err) {
-      return console.log(err);
+      return console.log("1 - LOOK --> ", err);
     } else {
       db.query(
-        "UPDATE income SET email=$1, name=$2, address=$3, phone=$4, date_joined=$5 WHERE id=$6",
+        "UPDATE people SET email=$1, name=$2, address=$3, phone=$4, date_joined=$5 WHERE id=$6",
         [email, name, address, phone, date_joined, Number(id)],
         (err, table) => {
           done();
           if (err) {
+            console.log("2 - LOOK --> ", err);
             return response.status(400).send(err);
           } else {
             console.log("DATA UPDATED");
