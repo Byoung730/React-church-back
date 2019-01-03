@@ -11,7 +11,7 @@ app.use(cors());
 const pool = new Pool({
   port: 5432,
   user: "evrvj",
-  password: XXXXXXX,
+  password: "gangster",
   database: "church",
   max: 10,
   host: "localhost"
